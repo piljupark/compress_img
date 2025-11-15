@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="무료 온라인 이미지 압축기 - 품질 손실 없이 이미지 용량을 줄이세요">
+    <title>이미지 압축기 - 무료 온라인 도구</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ImageCompress</h1>
+            <p class="subtitle">Compress and optimize your images</p>
+            
+            <!-- Premium Status -->
+            <div class="premium-status" id="premiumStatus">
+                <p class="free-tier">Free: <span id="usageCount">0</span>/5 images today</p>
+                <button class="upgrade-btn" id="upgradeBtn">Upgrade to Premium</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- 업로드 영역 -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-content">
+                    <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p class="upload-text">Drop your images here or</p>
+                    <button class="browse-btn">Browse Files</button>
+                    <p class="upload-subtext">JPG, PNG, WEBP • Max 10MB each</p>
+                    <p class="upload-subtext-small">Free: Up to 5 images • Premium: Up to 50 images</p>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" multiple hidden>
+            </div>
+
+            <!-- 압축 설정 및 결과 영역 -->
+            <div class="compression-area" id="compressionArea" style="display: none;">
+                <!-- 배치 헤더 -->
+                <div class="batch-header">
+                    <h2>Processing <span id="imageCount">0</span> image<span id="imagePlural">s</span></h2>
+                    <button class="btn btn-secondary" id="resetBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                            <path d="M21 3v5h-5"></path>
+                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                            <path d="M3 21v-5h5"></path>
+                        </svg>
+                        New Images
+                    </button>
+                </div>
+
+                <!-- 단일 이미지 비교 뷰 -->
+                <div class="single-view" id="singleView" style="display: none;">
+                    <div class="comparison-container">
+                        <div class="comparison-wrapper">
+                            <img id="comparisonOriginal" class="comparison-image" alt="Original">
+                            <img id="comparisonCompressed" class="comparison-image comparison-overlay" alt="Compressed">
+                            <div class="comparison-slider" id="comparisonSlider">
+                                <div class="slider-line"></div>
+                                <div class="slider-handle">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="15 18 9 12 15 6"></polyline>
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="comparison-labels">
+                            <div class="label-left">Original</div>
+                            <div class="label-right">Compressed</div>
+                        </div>
+                        <div class="comparison-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Original:</span>
+                                <span class="stat-value" id="singleOriginalSize">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Compressed:</span>
+                                <span class="stat-value" id="singleCompressedSize">-</span>
+                            </div>
+                            <div class="stat-item saved-stat">
+                                <span class="stat-label">Saved:</span>
+                                <span class="stat-value" id="singleSaved">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 전체 설정 -->
+                <div class="controls">
+                    <div class="quality-control">
+                        <label for="qualitySlider">
+                            Quality: <span id="qualityValue">80</span>%
+                        </label>
+                        <input type="range" id="qualitySlider" min="1" max="100" value="80">
+                        <p class="quality-hint">Apply to all images</p>
+                    </div>
+
+                    <div class="format-control">
+                        <label>Format:</label>
+                        <div class="format-buttons">
+                            <button class="format-btn active" data-format="original">
+                                Original
+                            </button>
+                            <button class="format-btn" data-format="image/jpeg">
+                                JPG
+                            </button>
+                            <button class="format-btn" data-format="image/png">
+                                PNG
+                            </button>
+                            <button class="format-btn" data-format="image/webp">
+                                WEBP
+                            </button>
+                        </div>
+                        <p class="format-hint" id="formatHint">Keep original format</p>
+                    </div>
+                </div>
+
+                <!-- 이미지 그리드 -->
+                <div class="image-grid" id="imageGrid"></div>
+
+                <!-- 단일 이미지 다운로드 -->
+                <div class="single-download" id="singleDownload" style="display: none;">
+                    <button class="btn btn-primary btn-large" id="downloadSingleBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download Compressed Image
+                    </button>
+                </div>
+
+                <!-- 전체 다운로드 버튼 -->
+                <div class="batch-actions" id="batchActions" style="display: none;">
+                    <div class="batch-stats">
+                        <p>Original: <span id="totalOriginalSize">0 MB</span></p>
+                        <p>Compressed: <span id="totalCompressedSize">0 MB</span></p>
+                        <p class="saved">Saved: <span id="totalSaved">0%</span></p>
+                    </div>
+                    <button class="btn btn-primary btn-large" id="downloadAllBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download All as ZIP
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2025 ImageCompress • All processing happens securely in your browser</p>
+        </footer>
+    </div>
+
+    <!-- Premium Modal -->
+    <div class="modal" id="premiumModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">×</button>
+            
+            <h2>Upgrade to Premium</h2>
+            <p class="modal-subtitle">Unlimited image compression with no daily limits</p>
+            
+            <div class="pricing-card">
+                <div class="price">$4.99</div>
+                <p class="price-subtitle">One-time payment • Lifetime access</p>
+                
+                <ul class="features">
+                    <li>✓ Unlimited compressions</li>
+                    <li>✓ All formats (JPG, PNG, WEBP)</li>
+                    <li>✓ No watermarks</li>
+                    <li>✓ Priority support</li>
+                    <li>✓ Lifetime updates</li>
+                </ul>
+                
+                <a href="https://gumroad.com/l/YOUR_PRODUCT_ID" class="buy-btn" target="_blank">
+                    Buy Now - $4.99
+                </a>
+                
+                <p class="secure-text">🔒 Secure payment via Gumroad</p>
+            </div>
+            
+            <div class="license-section">
+                <p class="license-text">Already purchased? Enter your license key:</p>
+                <div class="license-input-group">
+                    <input type="text" id="licenseInput" placeholder="Enter license key" class="license-input">
+                    <button id="activateBtn" class="activate-btn">Activate</button>
+                </div>
+                <p class="license-hint">Check your email for the license key</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Limit Reached Modal -->
+    <div class="modal" id="limitModal">
+        <div class="modal-content">
+            <button class="modal-close" id="limitModalClose">×</button>
+            
+            <h2>Daily Limit Reached</h2>
+            <p class="modal-subtitle">You've compressed 5 images today</p>
+            
+            <div class="limit-message">
+                <p>Free users can compress up to 5 images per day.</p>
+                <p>Upgrade to Premium for unlimited access!</p>
+            </div>
+            
+            <button class="upgrade-btn-large" id="upgradeBtnLarge">
+                Upgrade to Premium - $4.99
+            </button>
+            
+            <p class="reset-text">Free limit resets tomorrow</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
