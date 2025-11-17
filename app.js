@@ -25,25 +25,14 @@ const singleOriginalSize = document.getElementById('singleOriginalSize');
 const singleCompressedSize = document.getElementById('singleCompressedSize');
 const singleSaved = document.getElementById('singleSaved');
 
-// Premium 관련 요소
-const upgradeBtn = document.getElementById('upgradeBtn');
-const premiumModal = document.getElementById('premiumModal');
-const modalClose = document.getElementById('modalClose');
-const limitModal = document.getElementById('limitModal');
-const limitModalClose = document.getElementById('limitModalClose');
-const upgradeBtnLarge = document.getElementById('upgradeBtnLarge');
-const licenseInput = document.getElementById('licenseInput');
-const activateBtn = document.getElementById('activateBtn');
-const premiumStatus = document.getElementById('premiumStatus');
-
 // 전역 변수
 let selectedFormat = 'original';
 let imageFiles = []; // 배치 처리용 이미지 배열
 
 // Premium 관련 상태
-let isPremium = false;
-const FREE_BATCH_LIMIT = 20;
-const PREMIUM_BATCH_LIMIT = 50;
+let isPremium = true; // 내부 사용이므로 항상 Premium
+const FREE_BATCH_LIMIT = 999; // 사실상 무제한
+const PREMIUM_BATCH_LIMIT = 999; // 사실상 무제한
 
 // 파일 크기 포맷팅
 function formatFileSize(bytes) {
@@ -388,10 +377,7 @@ function handleFileSelect(files) {
             continue;
         }
         
-        if (file.size > 10 * 1024 * 1024) {
-            alert(`${file.name} is larger than 10MB.`);
-            continue;
-        }
+        // 크기 제한 제거 (내부 사용)
         
         validFiles.push({ file: file, compressed: null, index: validFiles.length });
     }
@@ -573,96 +559,4 @@ function updateFormatHint(format) {
     formatHint.textContent = hints[format] || 'Keep original format';
 }
 
-// ==================== Premium 기능 ====================
-
-function initPremium() {
-    isPremium = localStorage.getItem('premium') === 'true';
-    updatePremiumUI();
-}
-
-function updatePremiumUI() {
-    if (isPremium) {
-        premiumStatus.innerHTML = '<p class="premium-badge">⭐ PREMIUM</p>';
-    }
-}
-
-function showPremiumModal() {
-    premiumModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closePremiumModal() {
-    premiumModal.classList.remove('active');
-    document.body.style.overflow = 'auto';
-}
-
-function showLimitModal() {
-    limitModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeLimitModal() {
-    limitModal.classList.remove('active');
-    document.body.style.overflow = 'auto';
-}
-
-function validateLicenseKey(key) {
-    const pattern = /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
-    
-    if (pattern.test(key)) {
-        return true;
-    }
-    
-    if (key === 'DEMO-PREM-IUM-KEY1') {
-        return true;
-    }
-    
-    return false;
-}
-
-function activateLicense() {
-    const key = licenseInput.value.trim().toUpperCase();
-    
-    if (!key) {
-        alert('Please enter a license key');
-        return;
-    }
-    
-    if (validateLicenseKey(key)) {
-        isPremium = true;
-        localStorage.setItem('premium', 'true');
-        localStorage.setItem('licenseKey', key);
-        
-        updatePremiumUI();
-        closePremiumModal();
-        
-        alert('🎉 Premium activated successfully!');
-    } else {
-        alert('❌ Invalid license key. Please check and try again.');
-    }
-}
-
-// Premium 이벤트 리스너
-upgradeBtn.addEventListener('click', showPremiumModal);
-modalClose.addEventListener('click', closePremiumModal);
-limitModalClose.addEventListener('click', closeLimitModal);
-upgradeBtnLarge.addEventListener('click', () => {
-    closeLimitModal();
-    showPremiumModal();
-});
-activateBtn.addEventListener('click', activateLicense);
-
-premiumModal.addEventListener('click', (e) => {
-    if (e.target === premiumModal) {
-        closePremiumModal();
-    }
-});
-
-limitModal.addEventListener('click', (e) => {
-    if (e.target === limitModal) {
-        closeLimitModal();
-    }
-});
-
-// 페이지 로드 시 초기화
-initPremium();
+// 페이지 로드 시 초기화 (필요 없음)
