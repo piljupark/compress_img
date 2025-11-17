@@ -42,7 +42,7 @@ let imageFiles = []; // 배치 처리용 이미지 배열
 
 // Premium 관련 상태
 let isPremium = false;
-const FREE_BATCH_LIMIT = 5;
+const FREE_BATCH_LIMIT = 20;
 const PREMIUM_BATCH_LIMIT = 50;
 
 // 파일 크기 포맷팅
@@ -509,9 +509,7 @@ downloadAllBtn.addEventListener('click', async () => {
     
     // 여러 파일: ZIP으로 묶기 (JSZip 사용)
     if (typeof JSZip === 'undefined') {
-        alert('Please wait while loading ZIP library...');
-        
-        // JSZip 동적 로드
+        // JSZip 동적 로드 (alert 없이)
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
         script.onload = () => downloadAsZip();
