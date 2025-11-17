@@ -30,13 +30,12 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
-    background: var(--light-gray);
-    /* Soft noise for texture, mimicking the FinSage background */
+    /* background: var(--light-gray);
     background-image: url('/imgs/bg_01.webp');
     background-position: center;
     background-size: cover;
-    background-repeat: no-repeat;
-    color: var(--gray-900);
+    background-repeat: no-repeat; */
+    background: #373330;
     line-height: 1.5;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
@@ -61,7 +60,7 @@ header h1 {
     font-family: "Ancizar Serif", serif;
     font-size: 10rem;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #f9f9f9;
     letter-spacing: -0.04em;
     margin-bottom: 0.5rem;
     mix-blend-mode: plus-lighter;
@@ -667,10 +666,6 @@ footer {
     font-size: 0.875rem;
     font-weight: 400;
     margin-top: 4rem;
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translate(-50%, 0);
 }
 
 /* Responsive */
