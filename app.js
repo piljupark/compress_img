@@ -370,14 +370,25 @@ function handleFileSelect(files) {
     }
     
     // 파일 검증
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
+
     const validFiles = [];
     for (let file of files) {
-        if (!file.type.startsWith('image/')) {
-            alert(`${file.name} is not an image file.`);
+        // MIME 타입 체크
+        const fileType = file.type.toLowerCase();
+        if (!allowedTypes.includes(fileType)) {
+            alert(`${file.name} 확장자는 지원하지 않습니다. JPG, PNG, WEBP 파일만 가능합니다.`);
             continue;
         }
         
-        // 크기 제한 제거 (내부 사용)
+        // 확장자 체크 (추가 보안)
+        const fileName = file.name.toLowerCase();
+        const ext = fileName.slice(fileName.lastIndexOf('.'));
+        if (!allowedExtensions.includes(ext)) {
+            alert(`${file.name}: JPG, PNG, WEBP 파일만 가능합니다.`);
+            continue;
+        }
         
         validFiles.push({ file: file, compressed: null, index: validFiles.length });
     }
