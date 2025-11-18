@@ -73,7 +73,6 @@ header h1 {
     color: var(--gray-300);
     letter-spacing: -0.05em;
     margin-bottom: 1.5rem;
-
 }
 
 /* Upload Area - Clean, subtle elevation */
@@ -681,7 +680,7 @@ footer {
     .subtitle {
         font-size: 1.25rem;
     }
-    
+
     .comparison-container {
         padding: 1rem;
     }

@@ -569,5 +569,3 @@ function updateFormatHint(format) {
     };
     formatHint.textContent = hints[format] || 'Keep original format';
 }
-
-// 페이지 로드 시 초기화 (필요 없음)
