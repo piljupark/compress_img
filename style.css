@@ -30,11 +30,6 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
-    /* background: var(--light-gray);
-    background-image: url('/imgs/bg_01.webp');
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat; */
     background: #373330;
     line-height: 1.5;
     min-height: 100vh;
@@ -47,7 +42,6 @@ body {
     height: 100vh;
     margin: 0 auto;
     padding: 4rem 2rem;
-
 }
 
 /* Header */
@@ -115,7 +109,7 @@ header h1 {
 
 .browse-btn {
     padding: 0.75rem 1.75rem;
-    background: var(--gray-900); /* Blue accent for the button */
+    background: var(--gray-900);
     color: white;
     border: none;
     border-radius: 12px;
@@ -135,7 +129,6 @@ header h1 {
     font-size: 0.875rem;
     font-weight: 400;
 }
-
 
 /* Compression Area - Elevated card style */
 .compression-area {
@@ -181,10 +174,10 @@ header h1 {
     margin: 0 auto 1.5rem;
     border-radius: 12px;
     overflow: hidden;
-    background: var(--gray-900); /* Dark background for the comparison area */
+    background: var(--gray-900);
     box-shadow: var(--shadow-md);
 }
-/* Remaining comparison styles are fine as they are */
+
 .comparison-image {
     display: block;
     width: 100%;
@@ -325,7 +318,6 @@ header h1 {
     position: relative;
 }
 
-/* Image Card styles (fine as is, but slightly updated for contrast) */
 .image-card-header {
     display: flex;
     justify-content: space-between;
@@ -481,7 +473,7 @@ header h1 {
     padding-top: 2.5rem;
 }
 
-/* Quality Control - Fine tuning range slider */
+/* Quality Control */
 .quality-control {
     margin-bottom: 2.5rem;
 }
@@ -529,7 +521,7 @@ header h1 {
 #qualitySlider::-webkit-slider-thumb:active {
     box-shadow: 0 0 0 5px rgba(0, 122, 255, 0.2), 0 2px 8px rgba(0, 0, 0, 0.15);
 }
-/* Firefox thumb styles remain the same for compatibility */
+
 #qualitySlider::-moz-range-thumb {
     width: 20px;
     height: 20px;
@@ -613,7 +605,7 @@ header h1 {
     font-weight: 400;
 }
 
-/* Buttons - FinSage Ask AI style */
+/* Buttons */
 .btn {
     display: flex;
     align-items: center;
@@ -635,7 +627,6 @@ header h1 {
 }
 
 .btn-primary {
-    /* Black button, like FinSage 'Ask AI' */
     background: var(--primary);
     color: white;
 }
@@ -645,7 +636,6 @@ header h1 {
 }
 
 .btn-secondary {
-    /* White/Light button, for New Images */
     background: var(--white);
     color: var(--gray-900);
     border: 1px solid var(--gray-200);
@@ -656,7 +646,184 @@ header h1 {
     border-color: var(--gray-300);
 }
 
-/* Footer - Discreet and informative */
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    position: relative;
+    background: var(--white);
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.3s ease;
+    z-index: 1001;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 2rem 2rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.modal-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.modal-close {
+    background: var(--gray-100);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--gray-700);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    background: var(--gray-200);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.rename-option {
+    margin-bottom: 1.5rem;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 0.9375rem;
+}
+
+.radio-label input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.rename-custom {
+    margin-top: 1rem;
+    padding: 1.25rem;
+    background: var(--light-gray);
+    border-radius: 12px;
+    border: 1px solid var(--gray-100);
+}
+
+.rename-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.rename-input-group input[type="text"],
+.rename-input-group select {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    background: var(--white);
+    color: var(--gray-900);
+    transition: all 0.2s ease;
+}
+
+.rename-input-group input[type="text"]:focus,
+.rename-input-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.rename-separator {
+    font-weight: 700;
+    color: var(--gray-300);
+    font-size: 1.25rem;
+}
+
+.rename-preview {
+    font-size: 0.875rem;
+    color: var(--gray-300);
+    padding: 0.75rem;
+    background: var(--white);
+    border-radius: 8px;
+    border: 1px solid var(--gray-100);
+}
+
+.rename-preview span {
+    color: var(--gray-900);
+    font-weight: 600;
+    font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.modal-footer {
+    padding: 1rem 2rem 2rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    border-top: 1px solid var(--gray-100);
+}
+
+.modal-footer .btn {
+    min-width: 120px;
+}
+
+/* Footer */
 footer {
     text-align: center;
     padding: 3rem 0 2rem;
@@ -715,6 +882,19 @@ footer {
     .compression-area {
         padding: 2rem 1.5rem;
     }
+
+    .modal-content {
+        width: 95%;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .rename-input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
 @media (max-width: 480px) {
@@ -742,6 +922,3 @@ footer {
 .compression-area {
     animation: fadeIn 0.4s ease;
 }
-
-/* Modal styles have been omitted for brevity as they were not the focus of the request, 
-   but they should also be updated to follow the new, clean, elevated design. */

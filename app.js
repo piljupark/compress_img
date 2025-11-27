@@ -25,6 +25,17 @@ const singleOriginalSize = document.getElementById('singleOriginalSize');
 const singleCompressedSize = document.getElementById('singleCompressedSize');
 const singleSaved = document.getElementById('singleSaved');
 
+// 모달 요소
+const renameModal = document.getElementById('renameModal');
+const closeModal = document.getElementById('closeModal');
+const cancelRename = document.getElementById('cancelRename');
+const confirmDownload = document.getElementById('confirmDownload');
+const customPrefix = document.getElementById('customPrefix');
+const numberFormat = document.getElementById('numberFormat');
+const sequentialFormat = document.getElementById('sequentialFormat');
+const renamePreview = document.getElementById('renamePreview');
+const sequentialPreview = document.getElementById('sequentialPreview');
+
 // 전역 변수
 let selectedFormat = 'original';
 let imageFiles = []; // 배치 처리용 이미지 배열
@@ -101,6 +112,28 @@ function getExtension(mimeType) {
         'image/webp': '.webp'
     };
     return extensionMap[mimeType] || '.jpg';
+}
+
+// 숫자 포맷팅 함수
+function formatNumber(num, format) {
+    const numStr = String(num);
+    const padLength = format.length;
+    return numStr.padStart(padLength, '0');
+}
+
+// 파일명 생성 함수
+function generateFileName(index, originalName, renameType, prefix, format) {
+    const ext = originalName.substring(originalName.lastIndexOf('.'));
+    
+    if (renameType === 'none') {
+        return originalName;
+    } else if (renameType === 'custom') {
+        return `${prefix}_${formatNumber(index + 1, format)}${ext}`;
+    } else if (renameType === 'sequential') {
+        return `${formatNumber(index + 1, format)}${ext}`;
+    }
+    
+    return originalName;
 }
 
 // 이미지 카드 생성
@@ -480,11 +513,77 @@ downloadSingleBtn.addEventListener('click', () => {
     URL.revokeObjectURL(url);
 });
 
-// ZIP 다운로드 (JSZip 라이브러리 필요)
-downloadAllBtn.addEventListener('click', async () => {
+// 모달 열기
+function openRenameModal() {
+    renameModal.classList.add('active');
+    renameModal.style.display = 'flex';
+    updatePreview();
+}
+
+// 모달 닫기
+function closeRenameModal() {
+    renameModal.classList.remove('active');
+    setTimeout(() => {
+        renameModal.style.display = 'none';
+    }, 200);
+}
+
+// 프리뷰 업데이트
+function updatePreview() {
+    const renameType = document.querySelector('input[name="renameType"]:checked').value;
+    
+    if (renameType === 'custom') {
+        const prefix = customPrefix.value || 'image';
+        const format = numberFormat.value;
+        const sampleExt = imageFiles[0] ? imageFiles[0].file.name.substring(imageFiles[0].file.name.lastIndexOf('.')) : '.jpg';
+        renamePreview.textContent = `${prefix}_${formatNumber(1, format)}${sampleExt}`;
+    } else if (renameType === 'sequential') {
+        const format = sequentialFormat.value;
+        const sampleExt = imageFiles[0] ? imageFiles[0].file.name.substring(imageFiles[0].file.name.lastIndexOf('.')) : '.jpg';
+        sequentialPreview.textContent = `${formatNumber(1, format)}${sampleExt}`;
+    }
+}
+
+// 라디오 버튼 변경 이벤트
+document.querySelectorAll('input[name="renameType"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        document.getElementById('renameCustom').style.display = 
+            e.target.value === 'custom' ? 'block' : 'none';
+        document.getElementById('sequentialCustom').style.display = 
+            e.target.value === 'sequential' ? 'block' : 'none';
+        updatePreview();
+    });
+});
+
+// 입력 필드 변경 이벤트
+customPrefix.addEventListener('input', updatePreview);
+numberFormat.addEventListener('change', updatePreview);
+sequentialFormat.addEventListener('change', updatePreview);
+
+// 모달 닫기 버튼들
+closeModal.addEventListener('click', closeRenameModal);
+cancelRename.addEventListener('click', closeRenameModal);
+renameModal.querySelector('.modal-overlay')?.addEventListener('click', closeRenameModal);
+
+// 다운로드 확인
+confirmDownload.addEventListener('click', () => {
+    const renameType = document.querySelector('input[name="renameType"]:checked').value;
+    
+    let config = {
+        type: renameType,
+        prefix: customPrefix.value || 'image',
+        format: renameType === 'custom' ? numberFormat.value : sequentialFormat.value
+    };
+    
+    closeRenameModal();
+    performDownload(config);
+});
+
+// ZIP 다운로드 버튼 - 모달 열기로 변경
+downloadAllBtn.addEventListener('click', () => {
     if (imageFiles.length === 0) return;
     
-    // 간단한 방법: 하나씩 다운로드
+    // 1장일 경우 바로 다운로드
     if (imageFiles.length === 1) {
         const imgFile = imageFiles[0];
         if (!imgFile.compressed) return;
@@ -504,27 +603,45 @@ downloadAllBtn.addEventListener('click', async () => {
         return;
     }
     
-    // 여러 파일: ZIP으로 묶기 (JSZip 사용)
+    // 여러 파일일 경우 모달 열기
+    openRenameModal();
+});
+
+// 실제 다운로드 수행
+async function performDownload(config) {
+    if (imageFiles.length === 0) return;
+    
+    // JSZip 로드 확인
     if (typeof JSZip === 'undefined') {
-        // JSZip 동적 로드 (alert 없이)
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-        script.onload = () => downloadAsZip();
+        script.onload = () => downloadAsZip(config);
         document.head.appendChild(script);
         return;
     }
     
-    downloadAsZip();
-});
+    downloadAsZip(config);
+}
 
-async function downloadAsZip() {
+async function downloadAsZip(config) {
     const zip = new JSZip();
     
     imageFiles.forEach((imgFile, index) => {
         if (imgFile.compressed) {
-            const nameWithoutExt = imgFile.file.name.substring(0, imgFile.file.name.lastIndexOf('.'));
-            const ext = getExtension(imgFile.compressed.type);
-            zip.file(`${nameWithoutExt}_compressed${ext}`, imgFile.compressed);
+            let fileName;
+            
+            if (config.type === 'none') {
+                // 원본 파일명 유지
+                const nameWithoutExt = imgFile.file.name.substring(0, imgFile.file.name.lastIndexOf('.'));
+                const ext = getExtension(imgFile.compressed.type);
+                fileName = `${nameWithoutExt}_compressed${ext}`;
+            } else {
+                // 새로운 파일명 생성
+                const originalExt = getExtension(imgFile.compressed.type);
+                fileName = generateFileName(index, imgFile.file.name.replace(/\.[^.]+$/, originalExt), config.type, config.prefix, config.format);
+            }
+            
+            zip.file(fileName, imgFile.compressed);
         }
     });
     

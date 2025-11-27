@@ -236,6 +236,74 @@
         </footer>
     </div>
 
+    <!-- 파일명 변경 모달 -->
+    <div class="modal" id="renameModal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>파일명 변경 (선택)</h3>
+                <button class="modal-close" id="closeModal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="rename-option">
+                    <label class="radio-label">
+                        <input type="radio" name="renameType" value="none" checked>
+                        <span>원본 파일명 유지</span>
+                    </label>
+                </div>
+                <div class="rename-option">
+                    <label class="radio-label">
+                        <input type="radio" name="renameType" value="custom">
+                        <span>접두사 + 번호</span>
+                    </label>
+                    <div class="rename-custom" id="renameCustom" style="display: none;">
+                        <div class="rename-input-group">
+                            <input type="text" id="customPrefix" placeholder="접두사" value="image">
+                            <span class="rename-separator">_</span>
+                            <select id="numberFormat">
+                                <option value="1">1, 2, 3...</option>
+                                <option value="01" selected>01, 02, 03...</option>
+                                <option value="001">001, 002, 003...</option>
+                            </select>
+                        </div>
+                        <div class="rename-preview">
+                            미리보기: <span id="renamePreview">image_01.jpg</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="rename-option">
+                    <label class="radio-label">
+                        <input type="radio" name="renameType" value="sequential">
+                        <span>번호만 사용</span>
+                    </label>
+                    <div class="rename-custom" id="sequentialCustom" style="display: none;">
+                        <div class="rename-input-group">
+                            <select id="sequentialFormat">
+                                <option value="1">1, 2, 3...</option>
+                                <option value="01" selected>01, 02, 03...</option>
+                                <option value="001">001, 002, 003...</option>
+                            </select>
+                        </div>
+                        <div class="rename-preview">
+                            미리보기: <span id="sequentialPreview">01.jpg</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelRename">취소</button>
+                <button class="btn btn-primary" id="confirmDownload">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    다운로드
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
