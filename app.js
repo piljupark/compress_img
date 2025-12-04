@@ -1,3 +1,183 @@
+const canvas = document.getElementById('snowCanvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const snowflakes = [];
+const snowflakeCount = 150;
+const accumulatedSnow = []; // 쌓인 눈 입자들
+
+// 충돌 감지할 요소들
+let collisionElements = [];
+
+// 요소의 경계 박스 계산
+function getElementBounds(element) {
+    if (!element) return null;
+    const rect = element.getBoundingClientRect();
+    return {
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        bottom: rect.bottom
+    };
+}
+
+// 충돌 감지할 요소들 업데이트
+function updateCollisionElements() {
+    collisionElements = [];
+    
+    // 업로드 박스만 추가
+    const uploadArea = document.getElementById('uploadArea');
+    if (uploadArea && uploadArea.style.display !== 'none') {
+        collisionElements.push({
+            element: uploadArea,
+            bounds: getElementBounds(uploadArea),
+            type: 'box'
+        });
+    }
+}
+
+class Snowflake {
+    constructor() {
+        this.reset();
+    }
+
+    reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * -100 - 10;
+        this.radius = Math.random() * 2.5 + 1.5;
+        this.speed = Math.random() * 1 + 0.5;
+        this.wind = Math.random() * 0.5 - 0.25;
+        this.opacity = Math.random() * 0.6 + 0.4;
+    }
+
+    checkCollision() {
+        // 박스 충돌 체크 - 박스 위쪽에만 쌓이도록
+        for (let elem of collisionElements) {
+            if (!elem.bounds) continue;
+            
+            if (this.x >= elem.bounds.left && 
+                this.x <= elem.bounds.right &&
+                this.y + this.radius >= elem.bounds.top - 5 && 
+                this.y <= elem.bounds.top + 10) {
+                return { y: elem.bounds.top, isBox: true };
+            }
+        }
+        
+        return null;
+    }
+
+    update() {
+        this.y += this.speed;
+        this.x += this.wind;
+
+        const collision = this.checkCollision();
+        if (collision !== null && collision.isBox) {
+            // 박스 위에만 쌓이고, 위로는 쌓이지 않음
+            // 약간의 랜덤 오프셋으로 자연스럽게
+            const randomOffsetX = (Math.random() - 0.5) * this.radius * 2;
+            const randomOffsetY = (Math.random() - 0.5) * this.radius * 1.5;
+            
+            accumulatedSnow.push({
+                x: this.x + randomOffsetX,
+                y: collision.y - this.radius + randomOffsetY,
+                radius: this.radius,
+                opacity: this.opacity
+            });
+            
+            // 너무 많이 쌓이면 오래된 것 제거
+            if (accumulatedSnow.length > 1000) {
+                accumulatedSnow.shift();
+            }
+            
+            this.reset();
+            return;
+        }
+
+        if (this.y > canvas.height) {
+            this.reset();
+        }
+
+        if (this.x > canvas.width) {
+            this.x = 0;
+        } else if (this.x < 0) {
+            this.x = canvas.width;
+        }
+    }
+
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+        ctx.fill();
+    }
+}
+
+// 눈송이 생성
+for (let i = 0; i < snowflakeCount; i++) {
+    const flake = new Snowflake();
+    flake.y = Math.random() * canvas.height;
+    snowflakes.push(flake);
+}
+
+// 초기 요소 위치 업데이트
+setTimeout(() => {
+    updateCollisionElements();
+}, 100);
+
+// 애니메이션
+function animateSnow() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // 쌓인 눈 그리기
+    accumulatedSnow.forEach(snow => {
+        ctx.beginPath();
+        ctx.arc(snow.x, snow.y, snow.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${snow.opacity})`;
+        ctx.fill();
+    });
+    
+    // 떨어지는 눈 그리기
+    snowflakes.forEach(snowflake => {
+        snowflake.update();
+        snowflake.draw();
+    });
+
+    requestAnimationFrame(animateSnow);
+}
+
+animateSnow();
+
+// 리사이즈 이벤트
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        accumulatedSnow.length = 0;
+        updateCollisionElements();
+    }, 100);
+    
+    updateCollisionElements();
+});
+
+window.addEventListener('scroll', () => {
+    updateCollisionElements();
+});
+
+// 주기적으로 요소 위치 업데이트
+setInterval(() => {
+    updateCollisionElements();
+}, 1000);
+
+
+// ============================================
+// 기존 이미지 압축 기능 (변경 없음)
+// ============================================
+
 // DOM 요소
 const uploadArea = document.getElementById('uploadArea');
 const fileInput = document.getElementById('fileInput');

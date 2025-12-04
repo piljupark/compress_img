@@ -92,9 +92,15 @@
      crossorigin="anonymous"></script>
 </head>
 <body>
+    <!-- ⭐ 추가: 눈 내리는 캔버스 -->
+    <canvas id="snowCanvas"></canvas>
+
     <div class="container">
         <header>
-            <h1>Compfy</h1>
+            <!-- ⭐ 수정: title-wrapper로 감싸기 -->
+            <div class="title-wrapper">
+                <h1>Compfy</h1>
+            </div>
             <p class="subtitle">Be smaller, Be smarter</p>
         </header>
 
@@ -304,6 +310,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
