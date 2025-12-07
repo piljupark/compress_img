@@ -183,6 +183,20 @@
                         <p class="quality-hint">Apply to all images</p>
                     </div>
 
+                    <div class="target-size-control">
+                        <label>Target file size (optional):</label>
+                        <div class="target-size-inputs">
+                            <input type="number" id="targetSize" placeholder="e.g., 500" min="1">
+                            <select id="targetUnit">
+                                <option value="KB">KB</option>
+                                <option value="MB">MB</option>
+                            </select>
+                            <button class="btn-apply-target" id="applyTargetSize">Apply</button>
+                            <button class="btn-clear-target" id="clearTargetSize">Clear</button>
+                        </div>
+                        <p class="target-hint" id="targetHint">Each image will be compressed to target size</p>
+                    </div>
+
                     <div class="format-control">
                         <label>Format:</label>
                         <div class="format-buttons">
@@ -200,6 +214,43 @@
                             </button>
                         </div>
                         <p class="format-hint" id="formatHint">Keep original format</p>
+                    </div>
+
+                    <div class="resize-control">
+                        <label>Resize:</label>
+                        <div class="resize-buttons">
+                            <button class="resize-btn active" data-resize="1">
+                                Original
+                            </button>
+                            <button class="resize-btn" data-resize="0.5">
+                                1/2
+                            </button>
+                            <button class="resize-btn" data-resize="0.333">
+                                1/3
+                            </button>
+                            <button class="resize-btn" data-resize="0.25">
+                                1/4
+                            </button>
+                            <button class="resize-btn" data-resize="0.1">
+                                1/10
+                            </button>
+                        </div>
+                        <!-- 커스텀 사이즈 비활성화
+                        <div class="custom-resize">
+                            <label for="customWidth">Custom size (keep aspect ratio):</label>
+                            <div class="custom-resize-inputs">
+                                <input type="number" id="customWidth" placeholder="Width" min="1">
+                                <span>×</span>
+                                <input type="number" id="customHeight" placeholder="Height" min="1">
+                                <label class="aspect-ratio-toggle">
+                                    <input type="checkbox" id="keepAspectRatio" checked>
+                                    <span>Keep aspect ratio</span>
+                                </label>
+                            </div>
+                            <button class="btn-apply-custom" id="applyCustomSize">Apply</button>
+                        </div>
+                        -->
+                        <p class="resize-hint" id="resizeHint">Keep original size</p>
                     </div>
                 </div>
 

@@ -520,6 +520,107 @@ header h1 {
     font-weight: 700;
 }
 
+/* Target Size Control */
+.target-size-control {
+    margin-bottom: 2.5rem;
+}
+
+.target-size-control label {
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: var(--gray-900);
+}
+
+.target-size-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.target-size-inputs input[type="number"] {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.75rem;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    background: var(--white);
+    transition: all 0.2s ease;
+}
+
+.target-size-inputs input[type="number"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.target-size-inputs select {
+    padding: 0.75rem;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    background: var(--white);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.target-size-inputs select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.btn-apply-target,
+.btn-clear-target {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-apply-target {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-apply-target:hover {
+    background: #0051cc;
+}
+
+.btn-clear-target {
+    background: var(--gray-200);
+    color: var(--gray-900);
+}
+
+.btn-clear-target:hover {
+    background: var(--gray-300);
+}
+
+.target-hint {
+    font-size: 0.8125rem;
+    color: var(--gray-300);
+    text-align: center;
+    font-weight: 400;
+    margin-top: 0.75rem;
+}
+
+.target-hint.active {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+#qualityValue {
+    color: var(--accent);
+    font-weight: 700;
+}
+
 #qualitySlider {
     width: 100%;
     height: 4px;
@@ -727,4 +828,335 @@ header .title-wrapper {
 /* 업로드 박스 위치 조정 */
 .upload-area {
     position: relative;
+}
+
+/* Resize Control */
+.resize-control {
+    margin-bottom: 2.5rem;
+}
+
+.resize-control label {
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: var(--gray-900);
+}
+
+.resize-buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.resize-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.875rem;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.resize-btn:hover {
+    background: var(--light-gray);
+    border-color: var(--accent);
+}
+
+.resize-btn.active {
+    background: var(--gray-900);
+    border-color: var(--gray-900);
+    color: white;
+}
+
+.custom-resize {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--light-gray);
+    border-radius: 10px;
+}
+
+.custom-resize label {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.custom-resize > label {
+    display: block;
+}
+
+.custom-resize-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.custom-resize-inputs input[type="number"] {
+    flex: 1;
+    min-width: 100px;
+    padding: 0.75rem;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    background: var(--white);
+    color: var(--gray-900);
+    transition: all 0.2s ease;
+}
+
+.custom-resize-inputs input[type="number"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.custom-resize-inputs span {
+    color: var(--gray-300);
+    font-weight: 600;
+}
+
+.aspect-ratio-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--gray-900);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.aspect-ratio-toggle input[type="checkbox"] {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+.btn-apply-custom {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-apply-custom:hover {
+    background: #0051cc;
+}
+
+.resize-hint {
+    font-size: 0.8125rem;
+    color: var(--gray-300);
+    text-align: center;
+    font-weight: 400;
+    margin-top: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .resize-buttons {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .resize-buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ===================================== */
+/* 모달 스타일 */
+/* ===================================== */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.modal-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--gray-300);
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: var(--gray-100);
+    color: var(--gray-900);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.modal-footer button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-footer .btn-secondary {
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    color: var(--gray-900);
+}
+
+.modal-footer .btn-secondary:hover {
+    background: var(--gray-200);
+}
+
+.modal-footer .btn-primary {
+    background: var(--accent);
+    border: none;
+    color: white;
+}
+
+.modal-footer .btn-primary:hover {
+    background: #0051cc;
+}
+
+/* 파일명 변경 옵션 */
+.rename-option {
+    margin-bottom: 1.5rem;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.rename-custom {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--light-gray);
+    border-radius: 8px;
+}
+
+.rename-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.rename-input-group input,
+.rename-input-group select {
+    padding: 0.75rem;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 0.9375rem;
+}
+
+.rename-input-group input {
+    flex: 1;
+}
+
+.rename-separator {
+    color: var(--gray-300);
+    font-weight: 600;
+}
+
+.rename-preview {
+    font-size: 0.875rem;
+    color: var(--gray-300);
+}
+
+.rename-preview span {
+    color: var(--accent);
+    font-weight: 600;
 }

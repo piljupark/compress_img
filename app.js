@@ -1,3 +1,6 @@
+// ============================================
+// ⭐ 추가: 눈 내리는 효과
+// ============================================
 const canvas = document.getElementById('snowCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -218,6 +221,10 @@ const sequentialPreview = document.getElementById('sequentialPreview');
 
 // 전역 변수
 let selectedFormat = 'original';
+let selectedResize = 1; // 1 = 100% (원본 크기)
+let customWidth = null;
+let customHeight = null;
+let targetFileSize = null; // KB 단위 목표 용량
 let imageFiles = []; // 배치 처리용 이미지 배열
 
 // Premium 관련 상태
@@ -252,17 +259,32 @@ function compressImage(file, quality, outputFormat = 'original') {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
+                // 리사이징 계산
+                let width = img.width;
+                let height = img.height;
+                
+                if (selectedResize !== 1) {
+                    // 비율로 리사이징
+                    width = Math.round(img.width * selectedResize);
+                    height = Math.round(img.height * selectedResize);
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
                 
                 let mimeType = outputFormat === 'original' ? file.type : outputFormat;
                 
-                canvas.toBlob(
-                    (blob) => resolve(blob),
-                    mimeType,
-                    quality / 100
-                );
+                // 목표 용량이 설정되어 있으면 이진 탐색으로 품질 조정
+                if (targetFileSize) {
+                    compressToTargetSize(canvas, mimeType, targetFileSize).then(resolve).catch(reject);
+                } else {
+                    canvas.toBlob(
+                        (blob) => resolve(blob),
+                        mimeType,
+                        quality / 100
+                    );
+                }
             };
             
             img.onerror = reject;
@@ -271,6 +293,51 @@ function compressImage(file, quality, outputFormat = 'original') {
         
         reader.onerror = reject;
         reader.readAsDataURL(file);
+    });
+}
+
+// 목표 용량에 맞춰 압축 (이진 탐색)
+function compressToTargetSize(canvas, mimeType, targetSizeKB) {
+    return new Promise((resolve, reject) => {
+        const targetBytes = targetSizeKB * 1024;
+        let minQuality = 0.1;
+        let maxQuality = 1.0;
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        function tryCompress(quality) {
+            return new Promise((res) => {
+                canvas.toBlob((blob) => {
+                    res({ blob, size: blob.size, quality });
+                }, mimeType, quality);
+            });
+        }
+        
+        async function binarySearch() {
+            while (attempts < maxAttempts && (maxQuality - minQuality) > 0.01) {
+                attempts++;
+                const midQuality = (minQuality + maxQuality) / 2;
+                const result = await tryCompress(midQuality);
+                
+                if (Math.abs(result.size - targetBytes) < targetBytes * 0.05) {
+                    // 목표 크기의 ±5% 이내면 성공
+                    resolve(result.blob);
+                    return;
+                }
+                
+                if (result.size > targetBytes) {
+                    maxQuality = midQuality;
+                } else {
+                    minQuality = midQuality;
+                }
+            }
+            
+            // 최종 시도
+            const finalResult = await tryCompress(minQuality);
+            resolve(finalResult.blob);
+        }
+        
+        binarySearch().catch(reject);
     });
 }
 
@@ -574,11 +641,15 @@ function updateTotalStats() {
 function handleFileSelect(files) {
     if (!files || files.length === 0) return;
     
-    // 배치 제한 체크
-    const limit = isPremium ? PREMIUM_BATCH_LIMIT : FREE_BATCH_LIMIT;
+    // 기존 이미지가 있는지 확인
+    const isAddingToExisting = imageFiles.length > 0;
     
-    if (files.length > limit) {
-        alert(`${isPremium ? 'Premium' : 'Free'} users can process up to ${limit} images at once.`);
+    // 배치 제한 체크 (기존 + 새로운)
+    const limit = isPremium ? PREMIUM_BATCH_LIMIT : FREE_BATCH_LIMIT;
+    const totalCount = imageFiles.length + files.length;
+    
+    if (totalCount > limit) {
+        alert(`${isPremium ? 'Premium' : 'Free'} users can process up to ${limit} images at once. You currently have ${imageFiles.length} images.`);
         return;
     }
     
@@ -603,12 +674,13 @@ function handleFileSelect(files) {
             continue;
         }
         
-        validFiles.push({ file: file, compressed: null, index: validFiles.length });
+        validFiles.push({ file: file, compressed: null, index: imageFiles.length + validFiles.length });
     }
     
     if (validFiles.length === 0) return;
     
-    imageFiles = validFiles;
+    // 기존 이미지에 추가
+    imageFiles.push(...validFiles);
     
     uploadArea.style.display = 'none';
     compressionArea.style.display = 'block';
@@ -661,6 +733,9 @@ resetBtn.addEventListener('click', () => {
     qualitySlider.value = 80;
     qualityValue.textContent = '80';
     selectedFormat = 'original';
+    selectedResize = 1;
+    customWidth = null;
+    customHeight = null;
     
     document.querySelectorAll('.format-btn').forEach(btn => {
         btn.classList.remove('active');
@@ -668,7 +743,27 @@ resetBtn.addEventListener('click', () => {
             btn.classList.add('active');
         }
     });
+    
+    document.querySelectorAll('.resize-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.resize === '1') {
+            btn.classList.add('active');
+        }
+    });
+    
+    // 커스텀 사이즈 비활성화로 주석 처리
+    // document.getElementById('customWidth').value = '';
+    // document.getElementById('customHeight').value = '';
+    
+    // 목표 용량 초기화
+    targetFileSize = null;
+    document.getElementById('targetSize').value = '';
+    const targetHint = document.getElementById('targetHint');
+    targetHint.textContent = 'Each image will be compressed to target size';
+    targetHint.classList.remove('active');
+    
     updateFormatHint('original');
+    updateResizeHint(1);
     
     compressionArea.style.display = 'none';
     uploadArea.style.display = 'block';
@@ -853,7 +948,73 @@ document.addEventListener('click', (e) => {
             recompressAll();
         }
     }
+    
+    // 리사이징 버튼 이벤트
+    if (e.target.closest('.resize-btn')) {
+        const btn = e.target.closest('.resize-btn');
+        
+        document.querySelectorAll('.resize-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        selectedResize = parseFloat(btn.dataset.resize);
+        customWidth = null;
+        customHeight = null;
+        
+        // 커스텀 입력 필드 초기화 (비활성화)
+        // document.getElementById('customWidth').value = '';
+        // document.getElementById('customHeight').value = '';
+        
+        updateResizeHint(selectedResize);
+        
+        if (imageFiles.length === 1) {
+            recompressSingle();
+        } else if (imageFiles.length > 1) {
+            recompressAll();
+        }
+    }
 });
+
+// 커스텀 사이즈 적용
+// 커스텀 사이즈 비활성화
+/*
+document.getElementById('applyCustomSize').addEventListener('click', () => {
+    const widthInput = document.getElementById('customWidth');
+    const heightInput = document.getElementById('customHeight');
+    const keepAspect = document.getElementById('keepAspectRatio').checked;
+    
+    const width = parseInt(widthInput.value);
+    const height = parseInt(heightInput.value);
+    
+    if ((width > 0 || height > 0)) {
+        customWidth = width > 0 ? width : null;
+        customHeight = height > 0 ? height : null;
+        selectedResize = 1;
+        
+        // 리사이즈 버튼 비활성화
+        document.querySelectorAll('.resize-btn').forEach(b => b.classList.remove('active'));
+        
+        if (keepAspect) {
+            if (customWidth && customHeight) {
+                updateResizeHint(null, customWidth, null, 'width-based');
+            } else if (customWidth) {
+                updateResizeHint(null, customWidth, null, 'width');
+            } else if (customHeight) {
+                updateResizeHint(null, null, customHeight, 'height');
+            }
+        } else {
+            updateResizeHint(null, customWidth, customHeight, 'forced');
+        }
+        
+        if (imageFiles.length === 1) {
+            recompressSingle();
+        } else if (imageFiles.length > 1) {
+            recompressAll();
+        }
+    } else {
+        alert('Please enter at least width or height');
+    }
+});
+*/
 
 // 포맷 힌트 업데이트
 function updateFormatHint(format) {
@@ -866,3 +1027,84 @@ function updateFormatHint(format) {
     };
     formatHint.textContent = hints[format] || 'Keep original format';
 }
+
+// 리사이즈 힌트 업데이트
+function updateResizeHint(resize, customW, customH, mode) {
+    const resizeHint = document.getElementById('resizeHint');
+    
+    if (mode === 'width') {
+        resizeHint.textContent = `Width: ${customW}px (height: auto, keep ratio)`;
+    } else if (mode === 'height') {
+        resizeHint.textContent = `Height: ${customH}px (width: auto, keep ratio)`;
+    } else if (mode === 'width-based') {
+        resizeHint.textContent = `Width: ${customW}px (keep aspect ratio)`;
+    } else if (mode === 'forced') {
+        if (customW && customH) {
+            resizeHint.textContent = `Force resize: ${customW} × ${customH}px`;
+        } else if (customW) {
+            resizeHint.textContent = `Width: ${customW}px only`;
+        } else if (customH) {
+            resizeHint.textContent = `Height: ${customH}px only`;
+        }
+    } else if (customW && customH) {
+        resizeHint.textContent = `Custom size: ${customW} × ${customH}px`;
+    } else if (resize === 1) {
+        resizeHint.textContent = 'Keep original size';
+    } else if (resize === 0.5) {
+        resizeHint.textContent = 'Resize to 1/2 (50%)';
+    } else if (resize === 0.333) {
+        resizeHint.textContent = 'Resize to 1/3 (33%)';
+    } else if (resize === 0.25) {
+        resizeHint.textContent = 'Resize to 1/4 (25%)';
+    } else if (resize === 0.1) {
+        resizeHint.textContent = 'Resize to 1/10 (10%)';
+    } else {
+        const percentage = Math.round(resize * 100);
+        resizeHint.textContent = `Resize to ${percentage}%`;
+    }
+}
+
+// 목표 용량 적용
+document.getElementById('applyTargetSize').addEventListener('click', () => {
+    const targetInput = document.getElementById('targetSize');
+    const unitSelect = document.getElementById('targetUnit');
+    
+    const size = parseFloat(targetInput.value);
+    const unit = unitSelect.value;
+    
+    if (size > 0) {
+        // KB로 변환
+        targetFileSize = unit === 'MB' ? size * 1024 : size;
+        
+        // 힌트 업데이트
+        const hint = document.getElementById('targetHint');
+        hint.textContent = `Target: ${size}${unit} per image (quality auto-adjusted)`;
+        hint.classList.add('active');
+        
+        // 재압축
+        if (imageFiles.length === 1) {
+            recompressSingle();
+        } else if (imageFiles.length > 1) {
+            recompressAll();
+        }
+    } else {
+        alert('Please enter a valid file size');
+    }
+});
+
+// 목표 용량 제거
+document.getElementById('clearTargetSize').addEventListener('click', () => {
+    targetFileSize = null;
+    document.getElementById('targetSize').value = '';
+    
+    const hint = document.getElementById('targetHint');
+    hint.textContent = 'Each image will be compressed to target size';
+    hint.classList.remove('active');
+    
+    // 재압축
+    if (imageFiles.length === 1) {
+        recompressSingle();
+    } else if (imageFiles.length > 1) {
+        recompressAll();
+    }
+});
